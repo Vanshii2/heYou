@@ -12,9 +12,11 @@ dotenv.config();
 const PORT = process.env.PORT || 3000
 const app = express();
 
-app.use(express.json()) //req.body
+app.use(express.json({ limit: "5mb" }));
+//req.body
 app.use(cookieParser()); 
 
+//payloading too large can be fixed by adding the limit
 const __dirname= path.resolve();
 
 app.use("/api/auth", authRoutes)
