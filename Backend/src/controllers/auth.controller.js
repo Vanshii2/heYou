@@ -1,6 +1,7 @@
 import User from "../models/User.js"
 import bcrypt from "bcryptjs"
 import { generateToken } from "../lib/utils.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export const signup= async (req,res)=>{
     //grab that field  that  user will send us
@@ -100,4 +101,24 @@ export const logout = async (_, res)=>{
     res.cookie("jwt","",{maxAge:0});
     res.status(200).json({message:"Logged out successfully"})
     
+}
+
+
+export const updateProfile= async(req,res)=>{
+    const {profilePic} = req.body;
+    try{
+    if(!profilePic){
+        return res.status(400).json({message:"Profile picture required"})
+    }    
+    const userId= req.user._id;
+    const uploadResponse = await cloudinary.uploader.upload(profilePic)
+
+    const updatedUser= await User.findByIdAndUpdate(userId,{profilePic: uploadResponse.secure_url},{new:true})
+
+    res.status(200).json(updatedUser)
+
+}catch(error){
+    res.status(500).json({message:"Internal server error"})
+}
+
 }
